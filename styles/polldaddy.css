@@ -1,0 +1,18 @@
+.pds-question-top{  color: #F00 !important;}
+.pds-box {border: 0 none !important;width: auto !important;display: inline-block !important;}
+.pds-input-label {  width: auto !important;}
+.pds-answer{border: 0 none !important;padding: 0;}
+.pds-vote-button, .pds-vote-button-load {background: url("../images/global-buttons-small-sprite.gif") no-repeat scroll 0 0 transparent !important;background-position: -47px 0 !important;width: 44px !important;border: 0 none !important;border-radius: 0 !important;padding: 0 !important;cursor: pointer;float: left;margin: 0 7px 0 0;cursor: pointer;display: block;height: 21px;overflow: hidden;text-indent: -9999px;}
+.pds-vote-button:hover {background-position: -47px -21px !important;}
+.pds-view-results {background: url("../images/global-buttons-small-sprite.gif") no-repeat scroll transparent !important;background-position: -91px 0 !important;width: 87px !important;border: 0 none !important;border-radius: 0 !important;padding: 0 !important;cursor: pointer;float: left;margin: 0 7px 0 0;cursor: pointer;display: block;height: 21px;overflow: hidden;text-indent: -9999px;}
+.pds-view-results:hover {background-position: -91px -21px !important;  }
+.pds-share{display: none !important;}
+.pds-pd-link{display: none !important;}
+.pds-links{display: inline !important;}
+.pds-return-poll {background: url("../images/global-buttons-small-sprite.gif") no-repeat scroll transparent !important;background-position: -294px 0 !important;width: 87px !important;border: 0 none !important;border-radius: 0 !important;padding: 0 !important;cursor: pointer;float: left;margin: 0 7px 0 0;cursor: pointer;display: block;height: 21px;overflow: hidden;text-indent: -9999px;}
+.pds-return-poll:hover {background-position: -294px -21px !important;}
+.pds-answer-feedback{border: 0 none !important;}
+.pds-answer-feedback-bar {background: none repeat scroll 0 0 #EB1C21 !important;float: left;height: 10px !important;margin: 0 7px 2px 0;padding: 0;}
+.pds-answer-feedback{top: -19px;}
+.pds-feedback-label{top: 19px;}
+.pds-comments{display: none !important;}

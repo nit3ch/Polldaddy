@@ -1,0 +1,156 @@
+<?php
+/**
+ * @file
+ * Provides configurable blocks of polldaddy polls.
+ */
+
+/**
+ * Implements hook_menu().
+ */
+function polldaddy_menu() {
+  $items['admin/build/block/add-polldaddy'] = array(
+    'title' => 'Add poll block',
+    'description' => 'Add a new poll block.',
+    'access arguments' => array('administer blocks'),
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('polldaddy_add_block_form'),
+    'type' => MENU_LOCAL_TASK,
+    'file' => 'polldaddy.admin.inc',
+  );
+  $items['admin/build/block/delete-polldaddy'] = array(
+    'title' => 'Delete poll block',
+    'access arguments' => array('administer blocks'),
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('polldaddy_delete'),
+    'type' => MENU_CALLBACK,
+    'file' => 'polldaddy.admin.inc',
+  );
+  $items['admin/settings/polldaddy'] = array(
+    'title' => 'Polldaddy Settings',
+    'description' => 'Configure Polldaddy.',
+    'access arguments' => array('administer blocks'),
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('polldaddy_admin_settings_form'),
+    'type' => MENU_NORMAL_ITEM,
+    'file' => 'polldaddy.admin.inc',
+  );
+  $items['ajax/vote'] = array(
+    'title' => 'AJAX: vote',
+    'access callback' => TRUE,
+    'page callback' => 'polldaddy_page_reload',
+  );
+  return $items;
+}
+
+function polldaddy_form_block_admin_display_form_alter(&$form, $form_state) {
+  module_load_include('inc', 'polldaddy', 'polldaddy.admin');
+  _polldaddy_form_block_admin_display_form_alter($form, $form_state);
+}
+
+/**
+ * Implements hook_block().
+ */
+function polldaddy_block($op = 'list', $delta = NULL, $edit = NULL) {
+  $function = '_polldaddy_block_' . $op;
+  if (function_exists($function)) {
+    return $function($delta, $edit);
+  }
+  else {
+    // "op"s besides "view" are seldom used, so we store them in a separate file.
+    module_load_include('inc', 'polldaddy', 'polldaddy.admin');
+    if (function_exists($function)) {
+      return $function($delta, $edit);
+    }
+  }
+}
+
+/**
+ * Returns the configuration for the requested block delta.
+ *
+ * @param $delta
+ *   string The delta that uniquely identifies the block in the block system. If
+ *   not specified, the default configuration will be returned.
+ * @return
+ *   array An associated array of configuration options.
+ */
+function polldaddy_get_config($delta = NULL) {
+  $config = array(
+    'delta'       => $delta,
+    'poll_id' => 0,
+  );
+
+  // Get the block configuration options.
+  if ($delta) {
+    $config['poll_id']  = variable_get("polldaddy_{$delta}_poll_id",  $config['poll_id']);
+    $config['use_style']  = variable_get("polldaddy_{$delta}_use_style",  $config['use_style']);
+  }
+
+  return $config;
+}
+
+/**
+ * Returns the 'view' $op info for hook_block().
+ *
+ * @param $delta
+ *   string The name of the block to render.
+ */
+function _polldaddy_block_view($delta) {
+
+  $id = '.pane-polldaddy-'.$delta;
+
+  $poll_id = variable_get("polldaddy_{$delta}_poll_id", 0);
+  $use_style = variable_get("polldaddy_{$delta}_use_style", 0);
+
+  $css = '';
+  if(!$use_style){
+      $css = "<style>
+    {$id} .pds-question-top{  color: #F00 !important;}
+    {$id} .pds-box {border: 0 none !important;width: auto !important;display: inline-block !important;}
+    {$id} .pds-input-label {  width: auto !important;}
+    {$id} .pds-answer{border: 0 none !important;padding: 0;}
+    {$id} .pds-vote-button, .pds-vote-button-load {background: url('/sites/all/modules/polldaddy/images/global-buttons-small-sprite.gif') no-repeat scroll 0 0 transparent !important;background-position: -47px 0 !important;width: 44px !important;border: 0 none !important;border-radius: 0 !important;padding: 0 !important;cursor: pointer;float: left;margin: 0 7px 0 0;cursor: pointer;display: block;height: 21px;overflow: hidden;text-indent: -9999px;-moz-border-radius: 0 !important;}
+    {$id} .pds-vote-button:hover {background-position: -47px -21px !important;}
+    {$id} .pds-view-results {background: url('/sites/all/modules/polldaddy/images/global-buttons-small-sprite.gif') no-repeat scroll transparent !important;background-position: -91px 0 !important;width: 87px !important;border: 0 none !important;border-radius: 0 !important;padding: 0 !important;cursor: pointer;float: left;margin: 0 7px 0 0;cursor: pointer;display: block;height: 21px;overflow: hidden;text-indent: -9999px;}
+    {$id} .pds-view-results:hover {background-position: -91px -21px !important;  }
+    {$id} .pds-share{display: none !important;}
+    {$id} .pds-pd-link{display: none !important;}
+    {$id} .pds-links{display: inline !important;}
+    {$id} .pds-return-poll {background: url('/sites/all/modules/polldaddy/images/global-buttons-small-sprite.gif') no-repeat scroll transparent !important;background-position: -294px 0 !important;width: 87px !important;border: 0 none !important;border-radius: 0 !important;padding: 0 !important;cursor: pointer;float: left;margin: 0 7px 0 0;cursor: pointer;display: block;height: 21px;overflow: hidden;text-indent: -9999px;}
+    {$id} .pds-return-poll:hover {background-position: -294px -21px !important;}
+    {$id} .pds-answer-feedback{border: 0 none !important;}
+    {$id} .pds-answer-feedback-bar {background: none repeat scroll 0 0 #EB1C21 !important;float: left;height: 10px !important;margin: 0 7px 2px 0;padding: 0;}
+    {$id} .pds-answer-feedback{top: -19px;}
+    {$id} .pds-feedback-label{top: 19px;}
+    {$id} .pds-comments{display: none !important;}
+    {$id} .PDS_Poll {text-align: center;}</style>
+    ";    
+  }
+
+
+  //drupal_add_css($css);
+
+
+  $callback = '<script type="text/javascript" charset="utf-8">
+      var pd_callback_'.$poll_id.' = function(){
+        $("'.$id.'").hide();
+        $.getJSON("/ajax/vote",function(d){
+          location.reload(true);
+        })
+      };
+	</script>';
+  $voted = '';
+  if($_SESSION['polldaddy']['voted']){
+    $voted = '<script type="text/javascript" charset="utf-8">
+      location.href = "javascript:PD_vote'.$poll_id.'(1)";
+	</script>';
+  }
+  $block = array();
+  $block['subject'] = '';
+  $block['content'] = $css.$callback.'<script type="text/javascript" charset="utf-8" src="http://static.polldaddy.com/p/'.$poll_id.'.js"></script>'.$voted;;
+  return $block;
+}
+
+function polldaddy_page_reload(){
+  $_SESSION['polldaddy']['voted'] = TRUE;
+  return drupal_json(array('status' => 'ok'));
+}

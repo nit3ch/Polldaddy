@@ -1,0 +1,36 @@
+<?php
+/**
+ * @file
+ * Provides install, upgrade and un-install functions for polldaddy.
+ */
+
+/**
+ * Implements hook_uninstall().
+ */
+function polldaddy_uninstall() {
+  // Delete menu block variables.
+  foreach (variable_get('polldaddy_ids', array()) AS $delta) {
+    variable_del("polldaddy_{$delta}_poll_id");
+    variable_del("polldaddy_{$delta}_use_style");
+  }
+  variable_del('polldaddy_ids');
+  variable_del('polldaddy_settings');
+  // Remove block configurations.
+  db_query("DELETE FROM {blocks} WHERE module = 'polldaddy'");
+  db_query("DELETE FROM {blocks_roles} WHERE module = 'polldaddy'");
+  cache_clear_all();
+}
+
+/**
+ * Implements hook_enable().
+ */
+function polldaddy_enable() {
+  drupal_set_message(t('To use polldaddy, find the "Add poll block" tab (or button) on the <a href="@url">administer blocks page</a>.', array('@url' => url('admin/build/block'))));
+}
+
+/**
+ * Implements hook_install().
+ */
+function polldaddy_install() {
+  // No-op.
+}
